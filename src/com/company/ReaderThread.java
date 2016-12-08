@@ -3,25 +3,30 @@ package com.company;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 class ReaderThread extends Thread {
-    private URL urls[] = new URL[1];
+    private List<URL> urls;
 
-    ReaderThread(URL urls[]) {
+    ReaderThread(List<URL> urls) {
         this.urls = urls;
     }
 
     ReaderThread(URL url) {
-        this.urls[0] = url;
+        this.urls = new ArrayList<>();
+        this.urls.add(url);
     }
 
+    @Override
     public void run() {
         long start = System.currentTimeMillis();
 
         for (URL url : urls) {
             try {
                 HttpURLConnection con = (HttpURLConnection) url.openConnection();
-                System.out.println(this.getName() + "  " + url.toString() + ":  " + con.getResponseCode() + "  " + con.getResponseMessage());
+                System.out.format("%s  %s:  %d %s\n",
+                        Thread.currentThread().getName(), url.toString(), con.getResponseCode(), con.getResponseMessage());
                 con.disconnect();
             } catch (IOException e) {
                 e.printStackTrace();

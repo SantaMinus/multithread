@@ -15,14 +15,16 @@ import java.util.ArrayList;
 
 public class Main {
 
+    private static final int NUMBER_OF_THREADS = 5;
+
     public static void main(String[] args) throws IOException {
-        URL urls[] = new URL[5];
+        List<URL> urls = new ArrayList<>();
         if(args.length < 1) {
             System.err.println("Please specify 5 URLs");
             return;
         }
-        for(int i=0; i< 5; i++) {
-            urls[i] = new URL(args[i]);
+        for(String arg : args) {
+            urls.add(new URL(arg));
         }
 
         javaSingleThread(urls);
@@ -31,26 +33,24 @@ public class Main {
         futureMultiThread(urls);
     }
 
-    private static void javaSingleThread(URL urls[]) throws IOException {
+    private static void javaSingleThread(List<URL> urls) throws IOException {
         ReaderThread rt = new ReaderThread(urls);
         rt.start();
     }
 
-    private static void javaMultiThread(URL urls[]) {
-        for(int i = 0; i < 5; i++) {
-            ReaderThread rt = new ReaderThread(urls[i]);
+    private static void javaMultiThread(List<URL> urls) {
+        for(URL url : urls) {
+            ReaderThread rt = new ReaderThread(url);
             rt.start();
         }
     }
 
-    private static void futureSingleThread(URL urls[]) {
+    private static void futureSingleThread(List<URL> urls) {
         long start = System.currentTimeMillis();
-        ExecutorService executor = Executors.newSingleThreadExecutor();
+        ExecutorService executor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
         Future<String> future;
 
-        for(int i = 0; i < 5; i++) {
-            final URL url = urls[i];
-
+        for(URL url : urls) {
             Callable<String> callable = new Callable<String>() {
                 @Override
                 public String call() throws IOException {
@@ -74,14 +74,12 @@ public class Main {
         System.out.println("Future single thread: " + elapsedTimeMillis + "ms passed");
     }
 
-    private static void futureMultiThread(URL urls[]) {
+    private static void futureMultiThread(List<URL> urls) {
         long start = System.currentTimeMillis();
         ExecutorService pool = Executors.newFixedThreadPool(2);
-        List<Future<String>> futures = new ArrayList<Future<String>>();
+        List<Future<String>> futures = new ArrayList<>();
 
-        for(int i = 0; i < 5; i++) {
-            final URL url = urls[i];
-
+        for(URL url : urls) {
             Callable<String> task = new Callable<String>() {
                 @Override
                 public String call() throws IOException {
@@ -91,14 +89,14 @@ public class Main {
             };
             futures.add(pool.submit(task));
         }
-        for(int i = 0; i < 5; i++) {
+        for(Future<String> future : futures) {
             try {
-                String str = futures.get(i).get();
+                String str = future.get();
                 System.out.println(str);
             } catch (ExecutionException ee) {
                 System.err.println("Callable through exception: " + ee.getMessage());
             } catch (InterruptedException e) {
-                System.err.println("URL not responding");
+                e.printStackTrace();
             }
         }
 
