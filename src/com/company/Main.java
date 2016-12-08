@@ -10,6 +10,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.List;
+import java.util.ArrayList;
 
 public class Main {
 
@@ -74,8 +76,8 @@ public class Main {
 
     private static void futureMultiThread(URL urls[]) {
         long start = System.currentTimeMillis();
-        ExecutorService pool = Executors.newFixedThreadPool(5);
-        Future<String> future;
+        ExecutorService pool = Executors.newFixedThreadPool(2);
+        List<Future<String>> futures = new ArrayList<Future<String>>();
 
         for(int i = 0; i < 5; i++) {
             final URL url = urls[i];
@@ -87,9 +89,11 @@ public class Main {
                     return url.toString() + ": " + con.getResponseCode() + "  " + con.getResponseMessage();
                 }
             };
-            future = pool.submit(task);
+            futures.add(pool.submit(task));
+        }
+        for(int i = 0; i < 5; i++) {
             try {
-                String str = future.get();
+                String str = futures.get(i).get();
                 System.out.println(str);
             } catch (ExecutionException ee) {
                 System.err.println("Callable through exception: " + ee.getMessage());
@@ -97,15 +101,6 @@ public class Main {
                 System.err.println("URL not responding");
             }
         }
-
-        /*while (!future.isDone()) {
-            System.out.println("Waiting..");
-            try {
-                Thread.sleep(10); //sleep for 10 milliseconds before checking again
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }*/
 
         long elapsedTimeMillis = System.currentTimeMillis() - start;
         System.out.println("Future multi thread: " + elapsedTimeMillis + "ms passed");
