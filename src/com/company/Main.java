@@ -43,7 +43,7 @@ public class Main {
 
     private static void futureSingleThread(URL urls[]) {
         long start = System.currentTimeMillis();
-        ExecutorService executor = Executors.newSingleThreadExecutor();;
+        ExecutorService executor = Executors.newSingleThreadExecutor();
         Future<String> future;
 
         for(int i = 0; i < 5; i++) {
@@ -75,8 +75,7 @@ public class Main {
     private static void futureMultiThread(URL urls[]) {
         long start = System.currentTimeMillis();
         ExecutorService pool = Executors.newFixedThreadPool(5);
-        Future<String> future = null;
-        Object res;
+        Future<String> future;
 
         for(int i = 0; i < 5; i++) {
             final URL url = urls[i];
