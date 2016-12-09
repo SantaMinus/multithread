@@ -1,36 +1,34 @@
 package com.company;
 
 import java.io.IOException;
+import java.net.DatagramSocket;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 class ReaderThread extends Thread {
-    private List<URL> urls;
-
-    ReaderThread(List<URL> urls) {
-        this.urls = urls;
-    }
+    private URL url;
 
     ReaderThread(URL url) {
-        this.urls = new ArrayList<>();
-        this.urls.add(url);
+        this.url = Objects.requireNonNull(url, "URL should not be null");
     }
 
     @Override
     public void run() {
         long start = System.currentTimeMillis();
+        HttpURLConnection con = null;
 
-        for (URL url : urls) {
-            try {
-                HttpURLConnection con = (HttpURLConnection) url.openConnection();
-                System.out.format("%s  %s:  %d %s\n",
-                        Thread.currentThread().getName(), url.toString(), con.getResponseCode(), con.getResponseMessage());
+        try {
+            con = (HttpURLConnection) url.openConnection();
+            System.out.format("%s  %s:  %d %s\n",
+                    Thread.currentThread().getName(), url.toString(), con.getResponseCode(), con.getResponseMessage());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if(con != null)
                 con.disconnect();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
 
         long elapsedTimeMillis = System.currentTimeMillis() - start;
