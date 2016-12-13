@@ -1,7 +1,6 @@
 import com.company.ReaderCallable
-import spock.lang.Specification
 
-public class ReaderCallableSpec extends Specification {
+class ReaderThreadSpec extends spock.lang.Specification {
     def "it should require at least 1 URL"() {
         when:
         new ReaderCallable()
@@ -21,15 +20,5 @@ public class ReaderCallableSpec extends Specification {
         noExceptionThrown()
     }
 
-    def "it should get a response from a URL"() {
-        given:
-        URL url = new URL('https://vk.com')
-        ReaderCallable rc = new ReaderCallable(url)
-
-        when:
-        def res = rc.call()
-
-        then:
-        res == url.toString() + ': 200  OK'
-    }
+    // TODO: test a run() method somehow
 }

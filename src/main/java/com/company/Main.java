@@ -1,5 +1,7 @@
 package com.company;
 
+import groovyjarjarcommonscli.MissingOptionException;
+
 import java.io.IOException;
 
 import java.net.URL;
@@ -15,11 +17,10 @@ public class Main {
 
     private static final int NUMBER_OF_THREADS = 5;
 
-    public static void main(String[] args) throws IOException, ExecutionException, InterruptedException {
+    public static void main(String[] args) throws IOException, ExecutionException, InterruptedException, MissingOptionException {
         List<URL> urls = new ArrayList<>();
         if(args.length < 1) {
-            System.err.println("Please specify at least 1 URL");
-            return;
+            throw new MissingOptionException("Please specify at least 1 URL");
         }
         for(String arg : args) {
             urls.add(new URL(arg));
